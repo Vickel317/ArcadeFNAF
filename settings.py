@@ -43,6 +43,7 @@ dino = pygame.Rect(dinosaur_x, dinosaur_y, DINOSAUR_WIDTH, DINOSAUR_HEIGHT)
 
 # Obstacle settings
 OBSTACLE_WIDTH = 20
+OBSCTALE_SPAWN_X= 500 # Initial x position of the obstacle to make sure it's far enough before adding another one
 obstacles = []  # List to store obstacles
 SPAWN_OBSTACLE_EVENT = pygame.USEREVENT + 1  # Custom event for spawning obstacles
 pygame.time.set_timer(SPAWN_OBSTACLE_EVENT, random.randint(1500, 2500))  # Set timer for obstacle spawning

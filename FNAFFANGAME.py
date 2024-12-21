@@ -225,7 +225,8 @@ def load_dino_sprite_sheet():
 running_frames, jump_frame = load_dino_sprite_sheet()  # Load the frames
 
 def main():
-    global jumping, velocity_y, score, dino_game_active, dino_paused, current_pov, last_pov_change, flashlight, flashlightkeyduration, background_image, gameborder_x, gameborder_y, gamerborder_height, gameborder_width, sky_image, ground_image, gameover_x, gameover_y, retry_x, retry_y, pause_x, pause_y, resume_x, resume_y, sky_x, sky_y, ground_x, ground_y
+    global jumping, velocity_y, score, dino_game_active, dino_paused, current_pov, last_pov_change, flashlight, flashlightkeyduration, background_image, gameborder_x, gameborder_y, gamerborder_height, gameborder_width, sky_image, ground_image
+    global gameover_x, gameover_y, retry_x, retry_y, pause_x, pause_y, resume_x, resume_y, sky_x, sky_y, ground_x, ground_y
     running = True
 
     while running:
@@ -280,8 +281,12 @@ def main():
                                 score = 0  # Ensure score doesn't go below 0
                             obstacles.remove(obstacle)  # Remove the obstacle
                             dino.x = dinosaur_x
-                            dino.y = dinosaur_y # Reset dinosaur's vertical position
+                            dino.y = dinosaur_y  # Reset dinosaur's vertical position
                             break  # Exit the loop after handling collision
+
+                    # Ensure obstacles don't spawn too close to each other
+                    if obstacles and obstacles[-1]['rect'].x < OBSCTALE_SPAWN_X:
+                        pygame.time.set_timer(SPAWN_OBSTACLE_EVENT, random.randint(1500, 2500))
 
                 screen.blit(sky_image, (BOX_X, BOX_Y))  # Draw the sky image
                 screen.blit(ground_image, (ground_x,ground_y))  # Draw the ground image
