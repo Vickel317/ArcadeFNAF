@@ -62,21 +62,24 @@ dino_game_active = True  # State of the dinosaur game
 dino_paused = False  # Pause state of the game
 current_pov = "center"  # Current point of view (camera)
 last_pov_change = pygame.time.get_ticks()  # Time of the last POV change
+
 # Draw sky
 sky_image = pygame.image.load("images/sky.png").convert_alpha()  # Load the sky image
 sky_x, sky_y = 400, 240  # Position of the sky image
 sky_image = pygame.transform.scale(sky_image, (sky_x, sky_y))  # Adjust height to fit between ground and top of box
+
 # Draw ground
 ground_image = pygame.image.load("images/ground.png").convert_alpha()  # Load the ground image
 groundimg_height, groundimg_width = 400, 60  # Position of the ground image
 ground_x,ground_y= 200, 330  # Position of the ground image
 ground_image = pygame.transform.scale(ground_image, (groundimg_height,groundimg_width))  # Scale the ground image to fit the box width and dinosaur height
+
+#Text settings
 gameover_x, gameover_y = 400, 200  # Position of the game over image
 retry_x, retry_y = 400, 300  # Position of the retry image
 pause_x, pause_y = 260, 250 # Position of the pause image
 resume_x, resume_y= 260, 300 # Position of the resume image
 gameborder_x, gameborder_y, gamerborder_height, gameborder_width= 195, 145, 410, 310  # Position and dimensions of the game border
-
 
 # Timer variables
 game_start_time = pygame.time.get_ticks()  # Start time of the game

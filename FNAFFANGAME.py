@@ -103,6 +103,7 @@ class Enemy:
         else:
             print(f"Unknown jumpscare image: {self.jumpscare_image}")
             self.jumpscare_sound = None  # Set to None if unknown image
+
     def game_over_screen(self):
         """Display a game over screen with retry and placeholder for main menu."""
         font_large = pygame.font.Font('font/minecraft.ttf', 100)  # Load a large font
@@ -130,6 +131,26 @@ class Enemy:
 red_enemy = Enemy("left", "images/BBjumpscare.png")  # Create a red enemy
 blue_enemy = Enemy("right", "images/toy_bonniejumpscare.png")  # Create a blue enemy
 
+def load_dino_sprite_sheet():
+    """Load the dinosaur sprite sheet and extract frames for running and jumping."""
+    sheet = pygame.image.load(sprite_sheet_path).convert_alpha()  # Load the sprite sheet
+    sprite_width = sheet.get_width() // 5  # 5 columns in the sprite sheet
+    sprite_height = sheet.get_height() // 7  # 7 rows in the sprite sheet
+    running_frames = []
+
+    # Extract frames for running (top row)
+    for i in range(5):
+        frame = sheet.subsurface((i * sprite_width, 0, sprite_width, sprite_height))  # Extract frame
+        running_frames.append(pygame.transform.scale(frame, (DINOSAUR_WIDTH, DINOSAUR_HEIGHT)))  # Scale and add to list
+
+    # Extract frame for jumping (bottom-left frame)
+    jump_frame = sheet.subsurface((0, 6 * sprite_height, sprite_width, sprite_height))  # Extract frame
+    jump_frame = pygame.transform.scale(jump_frame, (DINOSAUR_WIDTH, DINOSAUR_HEIGHT))  # Scale the frame
+
+    return running_frames, jump_frame  # Return the frames
+
+running_frames, jump_frame = load_dino_sprite_sheet()  # Load the frames
+
 def update_dino_animation():
     """Update Dino animation based on running or jumping state."""
     global current_frame_index, animation_timer
@@ -151,8 +172,9 @@ def wingamecondition():
     return False  # Continue the game
 
 def restart_dinosaur_game():
-    """Reset the Dinosaur Game variables."""
-    global dino_game_active, score, obstacles, jumping, velocity_y, dino_paused, current_pov, hours, game_start_time, current_time_label, dinosaur_y
+    """Reset the game variables."""
+    global dino_game_active, score, obstacles, jumping, velocity_y, dino_paused, current_pov
+    global hours, game_start_time, current_time_label, dinosaur_y
     # Reset variables
     dino_game_active = True
     score = 0
@@ -203,30 +225,9 @@ def draw_timer():
     timer_text = font.render(current_time_label, True, BLACK)
     screen.blit(timer_text, (SCREEN_WIDTH - timer_text.get_width() - 20, SCREEN_HEIGHT - timer_text.get_height() - 20))
 
-# Load Dino Sprite Sheet
-def load_dino_sprite_sheet():
-    """Load the dinosaur sprite sheet and extract frames for running and jumping."""
-    sheet = pygame.image.load(sprite_sheet_path).convert_alpha()  # Load the sprite sheet
-    sprite_width = sheet.get_width() // 5  # 5 columns in the sprite sheet
-    sprite_height = sheet.get_height() // 7  # 7 rows in the sprite sheet
-    running_frames = []
-
-    # Extract frames for running (top row)
-    for i in range(5):
-        frame = sheet.subsurface((i * sprite_width, 0, sprite_width, sprite_height))  # Extract frame
-        running_frames.append(pygame.transform.scale(frame, (DINOSAUR_WIDTH, DINOSAUR_HEIGHT)))  # Scale and add to list
-
-    # Extract frame for jumping (bottom-left frame)
-    jump_frame = sheet.subsurface((0, 6 * sprite_height, sprite_width, sprite_height))  # Extract frame
-    jump_frame = pygame.transform.scale(jump_frame, (DINOSAUR_WIDTH, DINOSAUR_HEIGHT))  # Scale the frame
-
-    return running_frames, jump_frame  # Return the frames
-
-running_frames, jump_frame = load_dino_sprite_sheet()  # Load the frames
-
 def main():
-    global jumping, velocity_y, score, dino_game_active, dino_paused, current_pov, last_pov_change, flashlight, flashlightkeyduration, background_image, gameborder_x, gameborder_y, gamerborder_height, gameborder_width, sky_image, ground_image
-    global gameover_x, gameover_y, retry_x, retry_y, pause_x, pause_y, resume_x, resume_y, sky_x, sky_y, ground_x, ground_y
+    global jumping, velocity_y, score, dino_game_active, dino_paused, current_pov, last_pov_change, flashlight, flashlightkeyduration
+    global gameover_x, gameover_y, retry_x, retry_y, pause_x, pause_y, resume_x, resume_y
     running = True
 
     while running:
@@ -288,6 +289,7 @@ def main():
                     if obstacles and obstacles[-1]['rect'].x < OBSCTALE_SPAWN_X:
                         pygame.time.set_timer(SPAWN_OBSTACLE_EVENT, random.randint(1500, 2500))
 
+                #Draw sky and ground
                 screen.blit(sky_image, (BOX_X, BOX_Y))  # Draw the sky image
                 screen.blit(ground_image, (ground_x,ground_y))  # Draw the ground image
 
@@ -349,15 +351,6 @@ def main():
                     key_held_start = 0  # Reset when key is released
                     flashlight = False
 
-            # Check if F key is held long enough
-            if pygame.key.get_pressed()[pygame.K_f]:
-                if key_held_start and pygame.time.get_ticks() - key_held_start > flashlightkeyduration:
-                    if red_enemy.active and current_pov == "left":
-                        red_enemy.despawn()
-                    elif blue_enemy.active and current_pov == "right":
-                        blue_enemy.despawn()
-                    key_held_start = pygame.time.get_ticks()  # Reset the timer to allow continuous despawning
-
         # Show flashlight image if flashlight is true
         if flashlight:
             if red_enemy.active and current_pov == "left":
@@ -386,6 +379,13 @@ def main():
         if keys[pygame.K_d] and pygame.time.get_ticks() - last_pov_change > 500:
             current_pov = "right" if current_pov == "center" else "center"
             last_pov_change = pygame.time.get_ticks()
+        if keys [pygame.K_f]:
+            if key_held_start and pygame.time.get_ticks() - key_held_start > flashlightkeyduration:
+                if red_enemy.active and current_pov == "left":
+                    red_enemy.despawn()
+                elif blue_enemy.active and current_pov == "right":
+                    blue_enemy.despawn()
+                key_held_start = pygame.time.get_ticks()  # Reset the timer to allow continuous despawning
 
         # Draw timer
         draw_timer()
